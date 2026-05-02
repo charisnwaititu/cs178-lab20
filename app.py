@@ -103,17 +103,17 @@ def apply_dark_theme(fig):
     return fig
 
 
-def build_bad_chart(df):
-    """
-    Builds the deliberately broken pie chart.
-    """
-    fig = px.pie(
-        df,
-        names="stat",    # raw API names — not human-readable
-        values="value",
-        color="stat",    # rainbow — one color per stat, conveys nothing
-    )
-    return apply_dark_theme(fig)
+# def build_bad_chart(df):
+#     """
+#     Builds the deliberately broken pie chart.
+#     """
+#     fig = px.pie(
+#         df,
+#         names="stat",    # raw API names — not human-readable
+#         values="value",
+#         color="stat",    # rainbow — one color per stat, conveys nothing
+#     )
+#     return apply_dark_theme(fig)
 
 
 def build_good_chart(df, display_name, types):
@@ -138,19 +138,39 @@ def build_good_chart(df, display_name, types):
     }
 
     # ── START: Replace this with your radar chart, then update the color ───────
+    hex_color = TYPE_COLORS[types[0]]   # e.g. "#F08030"
+    # Strip the # and convert each pair of hex digits to an integer (0–255)
+    r = int(hex_color[1:3], 16)
+    g = int(hex_color[3:5], 16)
+    b = int(hex_color[5:7], 16)
 
-    # Step 1 — paste the radar chart code from the lab doc here.
+    fill   = f"rgba({r}, {g}, {b}, 0.3)"   # semi-transparent for the fill
+    border = f"rgba({r}, {g}, {b}, 1.0)"   # fully opaque for the line
 
-    # Step 2 — replace the hardcoded fillcolor and line color with the
-    #           color for this Pokémon's primary type. For example, if the
-    #           primary type is "fire" the color would be TYPE_COLORS["fire"].
-    #           Use types[0] to always get the primary type dynamically.
+    stats  = df["stat"].tolist()
+    values = df["value"].tolist()
+    stats_closed  = stats  + [stats[0]]
+    values_closed = values + [values[0]]
 
-    good_fig = px.pie(
-        df,
-        names="stat",
-        values="value",
-        color="stat",
+    good_fig = go.Figure()
+
+    good_fig.add_trace(go.Scatterpolar(
+        r=values_closed,
+        theta=stats_closed,
+        fill="toself",
+        fillcolor= fill,  # ← you'll change this
+        line=dict(color=border),            # ← and this
+        name=display_name,
+    ))
+
+    good_fig.update_layout(
+        title=f"{display_name} — Base Stat Radar",
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 160],
+            )
+        ),
     )
 
 
