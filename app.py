@@ -103,17 +103,17 @@ def apply_dark_theme(fig):
     return fig
 
 
-# def build_bad_chart(df):
-#     """
-#     Builds the deliberately broken pie chart.
-#     """
-#     fig = px.pie(
-#         df,
-#         names="stat",    # raw API names — not human-readable
-#         values="value",
-#         color="stat",    # rainbow — one color per stat, conveys nothing
-#     )
-#     return apply_dark_theme(fig)
+def build_bad_chart(df):
+    """
+    Builds the deliberately broken pie chart.
+    """
+    fig = px.pie(
+        df,
+        names="stat",    # raw API names — not human-readable
+        values="value",
+        color="stat",    # rainbow — one color per stat, conveys nothing
+    )
+    return apply_dark_theme(fig)
 
 
 def build_good_chart(df, display_name, types):
@@ -180,18 +180,32 @@ def build_good_chart(df, display_name, types):
 
 def build_my_chart(df, display_name, types):
     """
-    TODO (Part B): Students replace this placeholder with their own chart.
-
-    Use 'df' — it has two columns: "stat" and "value".
-    'types' is available here too if you want to use the type color.
-    Pick a chart type different from both the pie and the radar.
-    Your chart should work well for any Pokémon, not just Charizard.
+    Horizontal bar chart of Pokémon base stats.
     """
-    # ── Replace this placeholder with your own chart ───────────────────────────
+
+    # Sort stats for nicer visual ordering
+    df_sorted = df.sort_values("value", ascending=True)
+
+    # Colorblind-safe single color (blue)
+    bar_color = "#4C78A8"
+
     fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        x=df_sorted["value"],
+        y=df_sorted["stat"],
+        orientation="h",
+        marker=dict(color=bar_color),
+    ))
+
     fig.update_layout(
-        title="Your chart goes here — edit build_my_chart() in app.py",
+        title=f"{display_name} — Base Stats Comparison",
+        xaxis_title="Base Stat Value",
+        yaxis_title="Stat",
+        xaxis=dict(range=[0, max(df["value"]) + 10]),
+        margin=dict(l=80, r=20, t=60, b=40),
     )
+    
     # ── End of placeholder ─────────────────────────────────────────────────────
     return apply_dark_theme(fig)
 
